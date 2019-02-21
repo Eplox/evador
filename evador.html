@@ -1,0 +1,59 @@
+<html>
+<head>
+<script>
+function rot13(str) {
+    var input     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    var output    = 'NOPQRSTUVWXYZABCDEFGHIJKLMnopqrstuvwxyzabcdefghijklm';
+    var index     = x => input.indexOf(x);
+    var translate = x => index(x) > -1 ? output[index(x)] : x;
+    return str.split('').map(translate).join('');
+}
+
+function base64ToArrayBuffer(base64) {
+    var binaryString =  window.atob(base64);
+    var binaryLen = binaryString.length;
+    var bytes = new Uint8Array(binaryLen);
+    for (var i = 0; i < binaryLen; i++)        {
+        var ascii = binaryString.charCodeAt(i);
+        bytes[i] = ascii;
+    }
+    return bytes;
+}
+
+
+function save(data, name) {
+    var saveme = document.createElement("a");
+    document.body.appendChild(saveme);
+    saveme.style = "display: none";
+    saveme.setAttribute('id',"saveme");
+    var blob = new Blob(data, {type: "octet/stream"}),
+        url = window.URL.createObjectURL(blob);
+    saveme.href = url;
+    saveme.download = name;
+    saveme.click();
+    window.URL.revokeObjectURL(url);
+    document.getElementById("saveme").remove();
+};
+
+
+
+function download(url, name) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.onreadystatechange = function () {
+        if(xhr.readyState === 4 && xhr.status === 200) {
+            payload = base64ToArrayBuffer(rot13(xhr.responseText));
+            save([payload], name);
+        }
+    };
+    xhr.send();
+}
+
+</script>
+</head>
+<body>
+<input type="button" value="Download IDS/IPS evasive EICAR" onclick="download('eicar.txt', 'eicar.txt');">
+<br><br>
+<input type="button" value="Download MEME" onclick="download('picture.txt', 'meme.jpg');">
+</body>
+</html>
